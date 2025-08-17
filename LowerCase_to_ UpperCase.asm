@@ -1,44 +1,38 @@
 .MODEL SMALL
 .STACK 100H
-.DATA
-    msg db "Enter a letter: $"
+.DATA  
+    TEXT DB 10,13,"ENTER THE LETTER: $" 
+    TEXT2 DB 10,13,"THE LOWER CASE IS: $"   
+    VAL DB ?    
 .CODE
 MAIN PROC
-    MOV AX, @DATA
-    MOV DS, AX
-
-    ; Print message
-    MOV AH, 9
-    LEA DX, msg
+    MOV AX,@DATA
+    MOV DS,AX
+    ; Input
+    MOV AH,09
+    LEA DX,TEXT
     INT 21H
+    MOV AH,01
+    INT 21H 
+    MOV VAL,AL
 
-    ; Read char
-    MOV AH, 1
+    TOUPPER:
+    SUB VAL,32
+    MOV AH,09
+    LEA DX,TEXT2
     INT 21H
-    MOV BL, AL
+    JMP OUTPUT
 
-    ; If lowercase (a–z), convert to uppercase
-    CMP BL, 'a'
-    JL checkUpper
-    CMP BL, 'z'
-    JG checkUpper
-    SUB BL, 20H
-    JMP printChar
-
-checkUpper:
-    ; If uppercase (A–Z), convert to lowercase
-    CMP BL, 'A'
-    JL done
-    CMP BL, 'Z'
-    JG done
-    ADD BL, 20H
-
-printChar:
-    MOV DL, BL
-    MOV AH, 2
+    OUTPUT:
+    MOV AH,02
+    MOV DL,VAL
     INT 21H
-
-    MOV AH, 4CH
+     
+    ; Return program
+    MOV AH,4CH
     INT 21H
-MAIN ENDP
+    MAIN ENDP
 END MAIN
+
+
+
